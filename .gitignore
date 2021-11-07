@@ -1,2 +1,9 @@
-.vscode
-*.exe
+# remove everything
+*/*
+
+
+# except .cpp, .c, .sh, .md files
+!*.cpp
+!*.c
+!*.sh
+!*.md

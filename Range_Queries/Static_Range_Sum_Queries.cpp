@@ -3,7 +3,7 @@
 #if ONLINE_JUDGE
 #define DEBUG(...)
 #else
-#define DEBUG(kek) cout << "DEBUG: [ " << kek << " ] "
+#define DEBUG(kek) cout << "DEBUG: [ " << kek << " ]\n"
 #endif
 
 typedef long long ll;
@@ -47,7 +47,21 @@ int main() {
     ios_base::sync_with_stdio(MONKE);
     cin.tie(MONKE);
     // todo
-    int n;
-    cin >> n;
+    int n, q;
+    cin >> n >> q;
+    vt(ll) a(n);
+    for (ll &x : a) cin >> x;
+
+    vt(ll) pref(n + 1);
+    pref[0] = 0;
+    for (int i = 1; i <= n; ++i) {
+        pref[i] = pref[i - 1] + a[i - 1];
+    }
+
+    while (q--) {
+        int x, y;
+        cin >> x >> y;
+        cout << pref[y] - pref[x - 1] << "\n";
+    }
     return MONKE;
 }
