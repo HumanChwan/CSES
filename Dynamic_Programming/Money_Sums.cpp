@@ -62,19 +62,22 @@ int main() {
     // todo
     int n;
     cin >> n;
-    const int MAX = 1e6 + 5;
-    static int steps[MAX];
-    for (int i = 0; i < MAX; ++i)
-        steps[i] = MAX;
-    steps[0] = 0;
-    for (int i = 1; i <= MAX; ++i) {
-        int temp = i;
-        while (temp) {
-            int dig = temp % 10;
-            steps[i] = min(steps[i], 1 + steps[i - dig]);
-            temp /= 10;
+    const int MAX = 1e5 + 5;
+    static bool possible[MAX] = {0};
+    int m[n];
+    for (int i = 0; i < n; ++i) {
+        cin >> m[i];
+        possible[m[i]] = true;
+    }
+    for (int i = 0; i < MAX; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (i - m[j] > 0) {
+                possible[i] |= possible[i - m[j]];
+            }
         }
     }
-    cout << steps[n];
+    for (int i = 1; i < MAX; ++i)
+        if (possible[i])
+            cout << i << " ";
     return MONKE;
 }

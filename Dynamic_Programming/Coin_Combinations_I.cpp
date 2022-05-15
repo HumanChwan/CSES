@@ -1,43 +1,78 @@
 #include <bits/stdc++.h>
 
-#define MONKE 0
-#define M 1000000007
-#define all(x) x.begin(), x.end()
+#if ONLINE_JUDGE
+#define DEBUG(...)
+#else
+#define DEBUG(kek) cout << "DEBUG: [ " << #kek << " = " << kek << " ]\n"
+#endif
 
 typedef long long ll;
-;
+typedef unsigned long long ull;
 typedef long double ld;
 
+#define ff first
+#define ss second
+#define vt(...) vector<__VA_ARGS__>
+#define sz(...) (int)(__VA_ARGS__).size()
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+#define pb push_back
+#define mp make_pair
+#define all(x) x.begin(), x.end()
+
+constexpr int M = 1000000007;
+constexpr int MONKE = 0;
+
 using namespace std;
-int n, x;
-vector<int> a;
-const int mxX = 1e6 + 2;
-long long dp[mxX];
 
-long long CountBoi(int k) {
-    if (k == 0) return 1LL;
-    if (k < 0) return 0LL;
-    if (dp[k] != -1) return dp[k];
+template <typename T1, typename T2>
+ostream& operator<<(ostream& os, pair<T1, T2>& a) {
+    os << "{" << a.first << ", " << a.second << "}";
+    return os;
+}
 
-    dp[k] = 0LL;
-    for (int i = 0; i < n; ++i) {
-        dp[k] = (dp[k] + CountBoi(k - a[i])) % M;
+template <typename T>
+void debug(T container) {
+    cerr << "[ ";
+    for (auto x : container)
+        cerr << x << " ";
+    cerr << "]";
+}
+
+template <typename T1, typename T2>
+bool sort_by_second_greater(const pair<T1, T2>& a, const pair<T1, T2>& b) {
+    return (a.ss > b.ss);
+}
+
+ll power(ll num, ll exp, ll MOD = M) {
+    ll res = 1;
+    while (exp) {
+        if (exp & 1)
+            res = (res * num) % MOD;
+        num = (num * num) % MOD;
+        exp >>= 1;
     }
-
-    return dp[k];
+    return res;
 }
 
 int main() {
-    ios_base::sync_with_stdio(MONKE);  // unsync uWu
-    cin.tie(MONKE);                    // cin-cout unsync uWu
+    // unsync with C stream :)
+    ios_base::sync_with_stdio(MONKE);
+    cin.tie(0);
+    // todo
+    int n, x;
     cin >> n >> x;
-    a.resize(n);
-
-    memset(dp, -1, sizeof(dp));
-    for (int &c : a) {
-        cin >> c;
+    int coins[n];
+    for (int i = 0; i < n; ++i)
+        cin >> coins[i];
+    const int MAX = 1e6 + 5;
+    static ll ways[MAX] = {0};
+    ways[0] = 1;
+    for (int i = 1; i <= x; ++i) {
+        for (int j = 0; j < n; ++j) {
+            ways[i] = (ways[i] + (i >= coins[j] ? ways[i - coins[j]] : 0)) % M;
+        }
     }
-
-    cout << CountBoi(x);
+    cout << ways[x];
     return MONKE;
 }

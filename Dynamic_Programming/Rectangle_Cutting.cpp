@@ -55,26 +55,37 @@ ll power(ll num, ll exp, ll MOD = M) {
     return res;
 }
 
+const int MAX_N = 502;
+int rect_min[MAX_N][MAX_N];
+
 int main() {
     // unsync with C stream :)
     ios_base::sync_with_stdio(MONKE);
     cin.tie(0);
     // todo
-    int n;
-    cin >> n;
-    const int MAX = 1e6 + 5;
-    static int steps[MAX];
-    for (int i = 0; i < MAX; ++i)
-        steps[i] = MAX;
-    steps[0] = 0;
-    for (int i = 1; i <= MAX; ++i) {
-        int temp = i;
-        while (temp) {
-            int dig = temp % 10;
-            steps[i] = min(steps[i], 1 + steps[i - dig]);
-            temp /= 10;
+    int a, b;
+    cin >> a >> b;
+    if (b > a)
+        swap(a, b);
+    const int INF = 1e9;
+    for (int i = 0; i < MAX_N; ++i)
+        for (int j = 0; j < MAX_N; ++j)
+            rect_min[i][j] = INF;
+    for (int i = 1; i <= a; ++i) {
+        rect_min[i][i] = 0;
+    }
+    for (int i = 1; i <= a; ++i) {
+        for (int j = 1; j < i; ++j) {
+            for (int k = 1; k <= i / 2; ++k)
+                rect_min[i][j] = min(
+                    rect_min[i][j], 1 + rect_min[max(j, k)][min(j, k)] +
+                                        rect_min[max(j, i - k)][min(j, i - k)]);
+
+            for (int k = 1; k <= j / 2; ++k)
+                rect_min[i][j] = min(rect_min[i][j],
+                                     1 + rect_min[i][k] + rect_min[i][j - k]);
         }
     }
-    cout << steps[n];
+    cout << rect_min[a][b];
     return MONKE;
 }

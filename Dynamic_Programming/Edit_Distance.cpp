@@ -25,22 +25,7 @@ constexpr int MONKE = 0;
 
 using namespace std;
 
-template <typename T1, typename T2>
-ostream& operator<<(ostream& os, pair<T1, T2>& a) {
-    os << "{" << a.first << ", " << a.second << "}";
-    return os;
-}
-
-template <typename T>
-void debug(T container) {
-    cerr << "[ ";
-    for (auto x : container)
-        cerr << x << " ";
-    cerr << "]";
-}
-
-template <typename T1, typename T2>
-bool sort_by_second_greater(const pair<T1, T2>& a, const pair<T1, T2>& b) {
+bool sort_by_second(const pair<int, int>& a, const pair<int, int>& b) {
     return (a.ss > b.ss);
 }
 
@@ -60,21 +45,25 @@ int main() {
     ios_base::sync_with_stdio(MONKE);
     cin.tie(0);
     // todo
-    int n;
-    cin >> n;
-    const int MAX = 1e6 + 5;
-    static int steps[MAX];
-    for (int i = 0; i < MAX; ++i)
-        steps[i] = MAX;
-    steps[0] = 0;
-    for (int i = 1; i <= MAX; ++i) {
-        int temp = i;
-        while (temp) {
-            int dig = temp % 10;
-            steps[i] = min(steps[i], 1 + steps[i - dig]);
-            temp /= 10;
+    string N, M;
+    cin >> N >> M;
+    int n = sz(N), m = sz(M);
+    vt(vt(int)) dp(n + 1, vt(int)(m + 1));
+    for (int i = 0; i <= n; ++i) {
+        for (int j = 0; j <= m; ++j) {
+            if (i == 0)
+                dp[i][j] = j;
+            else if (j == 0)
+                dp[i][j] = i;
+            else {
+                if (N[i - 1] == M[j - 1])
+                    dp[i][j] = dp[i - 1][j - 1];
+                else
+                    dp[i][j] =
+                        1 + min({dp[i - 1][j], dp[i - 1][j - 1], dp[i][j - 1]});
+            }
         }
     }
-    cout << steps[n];
+    cout << dp[n][m];
     return MONKE;
 }
