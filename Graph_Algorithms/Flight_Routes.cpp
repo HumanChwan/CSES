@@ -45,41 +45,50 @@ bool sort_by_second_greater(const pair<T1, T2>& a, const pair<T1, T2>& b) {
     return (a.ss > b.ss);
 }
 
-ll power(ll num, ll exp, ll MOD = M) {
-    ll res = 1;
-    while (exp) {
-        if (exp & 1)
-            res = (res * num) % MOD;
-        num = (num * num) % MOD;
-        exp >>= 1;
-    }
-    return res;
-}
-
 int main() {
     // unsync with C stream :)
     ios_base::sync_with_stdio(MONKE);
     cin.tie(0);
     // todo
-    int n, x;
-    cin >> n >> x;
-    vt(int) price(n), page(n);
-    for (int i = 0; i < n; ++i)
-        cin >> price[i];
-    for (int i = 0; i < n; ++i)
-        cin >> page[i];
-    vt(vt(int)) maxPages(n, vt(int)(x + 1));
+    int n, m, k;
+    cin >> n >> m >> k;
+    vt(vt(pair<int, long long>)) edges(n);
+    while (m--) {
+        int a, b, c;
+        cin >> a >> b >> c;
+        a--, b--;
+        edges[a].pb({b, c});
+    }
 
-    for (int i = price[0]; i <= x; ++i)
-        maxPages[0][i] = page[0];
+    priority_queue<pair<long long, int>> Q;
+    constexpr long long INF = 1e18;
+    vt(vt(long long)) dist(n, vt(long long)(k, INF));
+    dist[0][0] = 0;
+    Q.push({0, 0});
+    vt(bool) vis(n);
+    int count = 0;
+    while (!Q.empty()) {
+        auto top = Q.top();
+        Q.pop();
 
-    for (int i = 1; i < n; ++i) {
-        for (int j = 0; j <= x; ++j) {
-            maxPages[i][j] = max(
-                maxPages[i - 1][j],
-                (j < price[i] ? 0 : maxPages[i - 1][j - price[i]] + page[i]));
+        if (count == k)
+            break;
+        count += (top.ss == n - 1);
+
+        for (auto edge : edges[top.ss]) {
+            if (-top.ff + edge.ss < dist[edge.ff][k - 1]) {
+                dist[edge.ff][k - 1] = edge.ss - top.ff;
+                for (int i = k - 1; i > 0; --i) {
+                    if (dist[edge.ff][i] >= dist[edge.ff][i - 1])
+                        break;
+                    swap(dist[edge.ff][i - 1], dist[edge.ff][i]);
+                }
+
+                Q.push({-edge.ss + top.ff, edge.ff});
+            }
         }
     }
-    cout << maxPages[n - 1][x];
+    for (int i = 0; i < k; ++i)
+        cout << dist[n - 1][i] << " ";
     return MONKE;
 }

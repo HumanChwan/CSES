@@ -45,15 +45,25 @@ bool sort_by_second_greater(const pair<T1, T2>& a, const pair<T1, T2>& b) {
     return (a.ss > b.ss);
 }
 
-ll power(ll num, ll exp, ll MOD = M) {
-    ll res = 1;
-    while (exp) {
-        if (exp & 1)
-            res = (res * num) % MOD;
-        num = (num * num) % MOD;
-        exp >>= 1;
+vt(vt(int)) edges;
+vt(long long) ways;
+vt(bool) vis;
+
+long long get_ways(int i, const int n) {
+    if (i == n - 1)
+        return 1LL;
+
+    if (vis[i])
+        return ways[i];
+
+    vis[i] = true;
+
+    long long w = 0;
+    for (int child : edges[i]) {
+        w = (w + get_ways(child, n)) % M;
     }
-    return res;
+
+    return ways[i] = w;
 }
 
 int main() {
@@ -61,25 +71,19 @@ int main() {
     ios_base::sync_with_stdio(MONKE);
     cin.tie(0);
     // todo
-    int n, x;
-    cin >> n >> x;
-    vt(int) price(n), page(n);
-    for (int i = 0; i < n; ++i)
-        cin >> price[i];
-    for (int i = 0; i < n; ++i)
-        cin >> page[i];
-    vt(vt(int)) maxPages(n, vt(int)(x + 1));
-
-    for (int i = price[0]; i <= x; ++i)
-        maxPages[0][i] = page[0];
-
-    for (int i = 1; i < n; ++i) {
-        for (int j = 0; j <= x; ++j) {
-            maxPages[i][j] = max(
-                maxPages[i - 1][j],
-                (j < price[i] ? 0 : maxPages[i - 1][j - price[i]] + page[i]));
-        }
+    int n, m;
+    cin >> n >> m;
+    edges = vt(vt(int))(n);
+    while (m--) {
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        edges[a].pb(b);
     }
-    cout << maxPages[n - 1][x];
+    ways = vt(long long)(n);
+    vis = vt(bool)(n);
+
+    cout << get_ways(0, n);
+
     return MONKE;
 }

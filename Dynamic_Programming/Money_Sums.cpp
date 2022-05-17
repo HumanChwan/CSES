@@ -62,22 +62,29 @@ int main() {
     // todo
     int n;
     cin >> n;
+    int coins[n];
+    for (int i = 0; i < n; ++i)
+        cin >> coins[i];
+
     const int MAX = 1e5 + 5;
     static bool possible[MAX] = {0};
-    int m[n];
+    possible[0] = true;
+
     for (int i = 0; i < n; ++i) {
-        cin >> m[i];
-        possible[m[i]] = true;
-    }
-    for (int i = 0; i < MAX; ++i) {
-        for (int j = 0; j < n; ++j) {
-            if (i - m[j] > 0) {
-                possible[i] |= possible[i - m[j]];
-            }
+        vt(int) add;
+        for (int j = coins[i]; j <= MAX; ++j) {
+            if (possible[j - coins[i]])
+                add.pb(j);
         }
+        for (int x : add)
+            possible[x] = true;
     }
-    for (int i = 1; i < MAX; ++i)
+    vt(int) poss;
+    for (int i = 1; i <= MAX; ++i)
         if (possible[i])
-            cout << i << " ";
+            poss.pb(i);
+    cout << sz(poss) << "\n";
+    for (int x : poss)
+        cout << x << " ";
     return MONKE;
 }

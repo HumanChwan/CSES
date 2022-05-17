@@ -1,103 +1,89 @@
 #include <bits/stdc++.h>
 
-#define MONKE 0
-#define M 1000000007
-#define all(x) x.begin(), x.end()
+#if ONLINE_JUDGE
+#define DEBUG(...)
+#else
+#define DEBUG(kek) cout << "DEBUG: [ " << #kek << " = " << kek << " ]\n"
+#endif
 
 typedef long long ll;
+typedef unsigned long long ull;
 typedef long double ld;
 
+#define ff first
+#define ss second
+#define vt(...) vector<__VA_ARGS__>
+#define sz(...) (int)(__VA_ARGS__).size()
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+#define pb push_back
+#define mp make_pair
+#define all(x) x.begin(), x.end()
+
+constexpr int M = 1000000007;
+constexpr int MONKE = 0;
+
 using namespace std;
-int n, m;
-vector<int> a;
-vector<pair<int, int>> LimitSet;
-const int mxN = 1e5 + 2;
-long long dp[mxN][102];
-bool visited[mxN][102];
 
-long long getFromFront(int i, int val) {
-    if (i >= n) {
-        return 1;
-    }
+template <typename T1, typename T2>
+ostream& operator<<(ostream& os, pair<T1, T2>& a) {
+    os << "{" << a.first << ", " << a.second << "}";
+    return os;
+}
 
-    if (visited[i][val]) {
-        return dp[i][val];
-    }
+template <typename T>
+void debug(T container) {
+    cerr << "[ ";
+    for (auto x : container)
+        cerr << x << " ";
+    cerr << "]";
+}
 
-    if (val < LimitSet[i].first || LimitSet[i].second < val) return 0;
-
-    if (a[i]) {
-        return (long long)(a[i] == val);
-    }
-
-    visited[i][val] = true;
-
-    dp[i][val] = 0;
-
-    if (i + 1 == n) {
-        dp[i][val] = 1;
-    } else {
-        for (int j = -1; j <= 1; ++j) {
-            dp[i][val] = (dp[i][val] + getFromFront(i + 1, val + j)) % M;
-        }
-    }
-    // dp[i][val] = (getFromFront(i + 1, val - 1) + getFromFront(i + 1, val) +
-    //               getFromFront(i + 1, val + 1)) %
-    //              M;
-    dp[i][val] = max(dp[i][val], 1LL);
-    // cout << i << " " << val << ": " << dp[i][val] << endl;
-
-    return dp[i][val];
+template <typename T1, typename T2>
+bool sort_by_second_greater(const pair<T1, T2>& a, const pair<T1, T2>& b) {
+    return (a.ss > b.ss);
 }
 
 int main() {
-    ios_base::sync_with_stdio(MONKE);  // unsync uWu
-    cin.tie(MONKE);                    // cin-cout unsync uWu
+    // unsync with C stream :)
+    ios_base::sync_with_stdio(MONKE);
+    cin.tie(0);
+    // todo
+    int n, m;
     cin >> n >> m;
-    a.resize(n);
-    LimitSet.resize(n);
-    for (int i = 0; i < n; ++i) {
+    int a[n];
+    for (int i = 0; i < n; ++i)
         cin >> a[i];
-        LimitSet[i] = {a[i] ? a[i] : 1, a[i] ? a[i] : m};
+    const int MAX_N = 1e5 + 2;
+    const int MAX_M = 1e2 + 2;
+    static ll ways[MAX_N][MAX_M] = {0};
+
+    for (int i = 1; i <= m; ++i) {
+        ways[0][i] = !a[0];
     }
+    if (a[0])
+        ways[0][a[0]] = 1;
+
     for (int i = 1; i < n; ++i) {
-        if (a[i]) continue;
-        LimitSet[i] = {max(1, LimitSet[i - 1].first - 1),
-                       min(m, LimitSet[i - 1].second + 1)};
-    }
-    for (int i = n - 2; i >= 0; --i) {
-        if (a[i]) continue;
-        LimitSet[i] = {max(LimitSet[i].first, LimitSet[i + 1].first - 1),
-                       min(LimitSet[i].second, LimitSet[i + 1].second + 1)};
-    }
-
-    long long result = 0;
-    if (a[0]) {
-        result = 1;
-    } else {
-        for (int i = LimitSet[0].first; i <= LimitSet[0].second; ++i) {
-            dp[0][1] = 0;
-            if (1 == n) {
-                dp[0][i] = 1;
-            } else {
-                for (int j = -1; j <= 1; ++j) {
-                    dp[0][i] = (dp[0][i] + getFromFront(1, i + j)) % M;
-                }
+        if (a[i]) {
+            for (int j = 1; j <= m; ++j)
+                ways[i][j] = 0;
+            ways[i][a[i]] = (ways[i - 1][a[i] - 1] + ways[i - 1][a[i]] +
+                             ways[i - 1][a[i] + 1]) %
+                            M;
+        } else {
+            for (int j = 1; j <= m; ++j) {
+                ways[i][j] =
+                    (ways[i - 1][j - 1] + ways[i - 1][j] + ways[i - 1][j + 1]) %
+                    M;
             }
-            result = (result + dp[0][i]) % M;
         }
     }
-
-    for (int i = 0; i < n; ++i) {
-        if (a[i] && i != n - 1) {
-            dp[i][a[i]] = 0;
-            for (int j = -1; j <= 1; ++j) {
-                dp[i][a[i]] = (dp[i][a[i]] + getFromFront(i + 1, a[i] + j)) % M;
-            }
-            // cout << "final " << i << ": " << dp[i][a[i]] << endl;
-            result = (result * dp[i][a[i]]) % M;
-        }
+    int ans = ways[n - 1][a[n - 1]];
+    if (!a[n - 1]) {
+        for (int i = 1; i <= m; ++i)
+            ans = (ans + ways[n - 1][i]) % M;
     }
-    cout << result;
+    cout << ans;
     return MONKE;
 }

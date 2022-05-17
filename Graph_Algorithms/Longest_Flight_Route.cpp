@@ -44,16 +44,29 @@ template <typename T1, typename T2>
 bool sort_by_second_greater(const pair<T1, T2>& a, const pair<T1, T2>& b) {
     return (a.ss > b.ss);
 }
+int n;
+vt(vt(int)) edges;
+vt(bool) vis;
+vt(int) mxLen;
 
-ll power(ll num, ll exp, ll MOD = M) {
-    ll res = 1;
-    while (exp) {
-        if (exp & 1)
-            res = (res * num) % MOD;
-        num = (num * num) % MOD;
-        exp >>= 1;
+int get_len(int i) {
+    if (i == n - 1)
+        return mxLen[n - 1];
+
+    if (vis[i])
+        return mxLen[i];
+
+    vis[i] = true;
+
+    int mx = -1;
+    for (int child : edges[i]) {
+        int nx = get_len(child);
+        if (nx < 0)
+            continue;
+        mx = max(mx, 1 + nx);
     }
-    return res;
+
+    return mxLen[i] = mx;
 }
 
 int main() {
@@ -61,25 +74,34 @@ int main() {
     ios_base::sync_with_stdio(MONKE);
     cin.tie(0);
     // todo
-    int n, x;
-    cin >> n >> x;
-    vt(int) price(n), page(n);
-    for (int i = 0; i < n; ++i)
-        cin >> price[i];
-    for (int i = 0; i < n; ++i)
-        cin >> page[i];
-    vt(vt(int)) maxPages(n, vt(int)(x + 1));
-
-    for (int i = price[0]; i <= x; ++i)
-        maxPages[0][i] = page[0];
-
-    for (int i = 1; i < n; ++i) {
-        for (int j = 0; j <= x; ++j) {
-            maxPages[i][j] = max(
-                maxPages[i - 1][j],
-                (j < price[i] ? 0 : maxPages[i - 1][j - price[i]] + page[i]));
-        }
+    int m;
+    cin >> n >> m;
+    edges = vt(vt(int))(n);
+    vis = vt(bool)(n);
+    while (m--) {
+        int a, b;
+        cin >> a >> b;
+        a--, b--;
+        edges[a].pb(b);
     }
-    cout << maxPages[n - 1][x];
+    mxLen = vt(int)(n, -1);
+    mxLen[n - 1] = 1;
+    get_len(0);
+
+    if (mxLen[0] != -1) {
+        cout << mxLen[0] << "\n";
+        int mx = mxLen[0], parent = 0;
+        while (mx--) {
+            cout << parent + 1 << " ";
+            for (int x : edges[parent]) {
+                if (mxLen[x] == mx) {
+                    parent = x;
+                    break;
+                }
+            }
+        }
+    } else {
+        cout << "IMPOSSIBLE";
+    }
     return MONKE;
 }
